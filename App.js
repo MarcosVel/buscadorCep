@@ -1,10 +1,31 @@
-import React, { useState } from 'react';
-import { SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Keyboard, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 import api from './src/services/api';
 
 export default function App() {
-  const [ cep, setCep ] = useState('')
+  const [ cep, setCep ] = useState('');
+  const inputRef = useRef(null);
+
+  function limpar() {
+    setCep('');
+    inputRef.current.focus(); // para apontar cursor e abrir teclado
+  }
+
+  async function buscar() {
+    if (cep == '') {
+      alert('Digite um cep válido');
+      return; // não continuar
+    }
+
+    try {
+      const response = await api.get(`/${ cep }/json`);
+      console.log(response.data);
+      Keyboard.dismiss();
+    } catch (error) {
+      console.log('ERROS: ' + error)
+    }
+  }
 
   return (
     <SafeAreaView style={ styles.container }>
@@ -16,14 +37,22 @@ export default function App() {
           value={ cep }
           onChangeText={ (texto) => setCep(texto) }
           keyboardType='numeric'
+          ref={ inputRef }
         />
       </View>
 
       <View style={ styles.areaBtn }>
-        <TouchableOpacity style={ [ styles.botao, { backgroundColor: '#1d75cd' } ] }>
+        <TouchableOpacity
+          style={ [ styles.botao, { backgroundColor: '#1d75cd' } ] }
+          onPress={ buscar }
+        >
           <Text style={ styles.botaoText }>Buscar</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={ [ styles.botao, { backgroundColor: '#cd3e1a' } ] }>
+
+        <TouchableOpacity
+          style={ [ styles.botao, { backgroundColor: '#cd3e1a' } ] }
+          onPress={ limpar }
+        >
           <Text style={ styles.botaoText }>Limpar</Text>
         </TouchableOpacity>
       </View>
