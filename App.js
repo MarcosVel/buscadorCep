@@ -6,6 +6,7 @@ import api from './src/services/api';
 export default function App() {
   const [ cep, setCep ] = useState('');
   const inputRef = useRef(null);
+  const [ cepUser, setCepUser ] = useState(null);
 
   function limpar() {
     setCep('');
@@ -20,7 +21,8 @@ export default function App() {
 
     try {
       const response = await api.get(`/${ cep }/json`);
-      console.log(response.data);
+      // console.log(response.data);
+      setCepUser(response.data);
       Keyboard.dismiss();
     } catch (error) {
       console.log('ERROS: ' + error)
@@ -57,13 +59,15 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-      <View style={ styles.resultado }>
-        <Text style={ styles.itemText }>CEP: 7900000</Text>
-        <Text style={ styles.itemText }>Logradouro: Rua</Text>
-        <Text style={ styles.itemText }>Bairro: Campos Elísios</Text>
-        <Text style={ styles.itemText }>Cidade: Varginha</Text>
-        <Text style={ styles.itemText }>Estado: MG</Text>
-      </View>
+      { cepUser &&
+        <View style={ styles.resultado }>
+          <Text style={ styles.itemText }>CEP: { cepUser.cep }</Text>
+          <Text style={ styles.itemText }>Logradouro: { cepUser.logradouro }</Text>
+          <Text style={ styles.itemText }>Bairro: { cepUser.bairro }</Text>
+          <Text style={ styles.itemText }>Cidade: { cepUser.localidade }</Text>
+          <Text style={ styles.itemText }>Estado: { cepUser.uf }</Text>
+        </View>
+      }
     </SafeAreaView>
   )
 }
@@ -109,6 +113,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 10
   },
   itemText: {
     fontSize: 20
